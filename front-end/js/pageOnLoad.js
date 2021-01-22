@@ -9,16 +9,16 @@ function getCurCanvas(viewId) {
     var postData = "id=" + gvd.curCanvasId;
     for (var i = 0; i < gvd.predicates.length; i++)
         postData += "&predicate" + i + "=" + getSqlPredicate(gvd.predicates[i]);
-    if (postData in globalVar.cachedCanvases)
-        return new Promise(function(resolve) {
-            // note that we don't directly get canvas objects from gvd.project
-            // because sometimes the canvas w/h is dynamic and not set, in which
-            // case we need to fetch from the backend (using gvd.predicates)
-            gvd.curCanvas = globalVar.cachedCanvases[postData].canvasObj;
-            gvd.curStaticData = globalVar.cachedCanvases[postData].staticData;
-            setupLayerLayouts(viewId);
-            resolve();
-        });
+    // if (postData in globalVar.cachedCanvases)
+    //     return new Promise(function(resolve) {
+    //         // note that we don't directly get canvas objects from gvd.project
+    //         // because sometimes the canvas w/h is dynamic and not set, in which
+    //         // case we need to fetch from the backend (using gvd.predicates)
+    //         gvd.curCanvas = globalVar.cachedCanvases[postData].canvasObj;
+    //         gvd.curStaticData = globalVar.cachedCanvases[postData].staticData;
+    //         setupLayerLayouts(viewId);
+    //         resolve();
+    //     });
 
     // otherwise make a non-blocked http request to the server
     return $.ajax({
@@ -183,6 +183,15 @@ function pageOnLoad(serverAddr) {
         globalVar.serverAddr = serverAddr;
     } else globalVar.serverAddr = "";
 
+    updateTree();
+    $(":button").addClass("btn btn-default btn-sm");
+    $("input[type='submit']").not("#upload_btn").addClass("btn btn-default btn-sm");
+}
+
+function showKyrix() {
+    // remove existing kyrix viz
+    d3.selectAll(".kyrixdiv").remove();
+
     // create a div where kyrix vis lives in
     var kyrixDiv = d3
         .select("body")
@@ -247,6 +256,9 @@ function pageOnLoad(serverAddr) {
             kyrixDiv
                 .style("max-width", containerW + param.buttonAreaWidth + "px")
                 .style("max-height", containerH + "px");
+
+            // if using ui
+            kyrixDiv.style("left", $(".menu").width() + "px");
 
             // Create container svg and set its top-left corner at (0, 90) in kyrixDiv
             kyrixDiv

@@ -55,6 +55,7 @@ function drawZoomButtons(viewId) {
         (+(+d3.select(viewClass + ".viewsvg").attr("y")) * containerW) /
             curViewportW;
     var leftMargin = 50;
+    leftMargin = $(".menu").width();
     var topMargin = 80;
     var dist = 50;
     d3.select(viewClass + ".gobackbutton")

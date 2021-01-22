@@ -1,8 +1,272 @@
 <html>
-    <body></body>
+    <body>
+        <div id="editor_div" style="display:none;">
+            <div id="editor_div_title"></div>
+            <div id="editor"></div>
+        </div>
+        <div class="menu">
+
+            <div class="btn-group">
+                <button onclick="sendProject()">Send Project to Backend</button>
+                <button onclick="importProjectButton()">Import</button>
+                <button onclick="exportProject()">Export</button>
+            </div>
+            <br>
+            <button onclick="showKyrix()">Show</button>
+            <a id="export-el"></a>
+
+            <form id="upload_div" onsubmit="return importProject();" style="display:none;">
+                <input type="submit" id="upload_btn" class="btn btn-xs">
+                <input type="file" id="upload_file">
+            </form>
+
+            <div id="graph-viz"></div>
+            <div class="add-edit-div">
+                <div id="e-c-div" style="display:none;" class="add-edit">
+                    <h4>Edit Canvas</h4>
+                    <form id="e-canvasForm" onsubmit="return editCanvasSubmit();">
+                        <label for="e-c-id">Id </label><input id="e-c-id" type="text" name="e-c-id">
+                        <br>
+                        <label for="e-c-width">Width </label><input id="e-c-width" type="number" name="e-c-width">
+                        <br>
+                        <label for="e-c-height">Height </label><input id="e-c-height" type="number" name="e-c-height">
+                        <div class="button-row">
+                            <button onclick="hideEdit('c');return false;">Cancel</button>
+                            <input type="submit" value="Submit Changes">
+                            <br>
+                            <button onclick="return deleteCanvas();">Delete Canvas</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="e-t-div" style="display:none;" class="add-edit">
+                    <h4>Edit Transform</h4>
+                    <form id="e-transformForm" onsubmit="return editTransformSubmit();">
+                        <label for="e-t-name">Name </label><input id="e-t-name" type="text" name="e-t-name">
+                        <br>
+                        <label for="e-t-sql">SQL Query </label><input id="e-t-sql" type="text" name="e-t-sql">
+                        <br>
+                        <label for="e-t-db">DB Name </label><input id="e-t-db" type="text" name="e-t-db">
+                        <div id="e-t-func">click to edit transform function</div>
+                        <label for="e-t-colnames">Column Names </label><input id="e-t-colnames" type="text" name="e-t-colnames">
+                        <br>
+                        <label for="e-t-separable">Check if separable </label><input id="e-t-separable" type="checkbox" name="e-t-separable">
+                        <div class="button-row">
+                            <button onclick="hideEdit('t');hideEditor();return false;">Cancel</button>
+                            <input type="submit" value="Submit Changes" id="e-t-submit-btn">
+                            <br>
+                            <button onclick="return deleteTransform();">Delete Transform</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="e-l-div" style="display:none;" class="add-edit">
+                    <h4>Edit Layer</h4>
+                    <form id="e-layerForm" onsubmit="return editLayerSubmit();">
+                        <select id="e-l-transform-select">
+                            <option>Pick Transform</option>
+                        </select>
+                        <br>
+                        <label for="e-l-static">Check if static </label><input id="e-l-static" type="checkbox" name="e-l-static">
+                        <br>
+                        <select class="canvas-select" id="e-l-canvas-select">
+                            <option>Add to Canvas</option>
+                        </select>
+                        <div id="e-l-rendering">click to edit rendering function</div>
+                        <div class="button-row">
+                            <button onclick="hideEdit('l');hideEditor();return false;">Cancel</button>
+                            <input type="submit" value="Submit Changes" id="e-l-submit-btn">
+                            <br>
+                            <button onclick="return deleteLayer();">Delete Layer</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="e-v-div" style="display:none;" class="add-edit">
+                    <h4>Edit View</h4>
+                    <form id="e-viewForm" onsubmit="return editViewSubmit();">
+                        <label for="e-v-id">Id </label><input id="e-v-id" type="text" name="e-v-id">
+                        <br>
+                        <label for="e-v-minx">Min X </label><input id="e-v-minx" type="number" name="e-v-minx">
+                        <br>
+                        <label for="e-v-miny">Min Y </label><input id="e-v-miny" type="number" name="e-v-miny">
+                        <br>
+                        <label for="e-v-width">Width </label><input id="e-v-width" type="number" name="e-v-width">
+                        <br>
+                        <label for="e-v-height">Height </label><input id="e-v-height" type="number" name="e-v-height">
+                        <br>
+                        <b>Set initial states</b>
+                        <br>
+                        <select class="canvas-select" id="e-v-initialcanvas">
+                            <option>Select Canvas</option>
+                        </select>
+                        <br>
+                        <label for="e-v-initialx">Initial X </label><input id="e-v-initialx" type="number" name="e-v-initialx">
+                        <br>
+                        <label for="e-v-initialy">Initial Y </label><input id="e-v-initialy" type="number" name="e-v-initialy">
+                        <div class="button-row">
+                            <button onclick="hideEdit('v');return false;">Cancel</button>
+                            <input type="submit" value="Submit Changes" id="e-v-submit-btn">
+                            <br>
+                            <button onclick="return deleteView();">Delete View</button>
+                        </div>
+                    </form>
+                </div>
+
+                <div id="e-j-div" style="display:none;" class="add-edit">
+                    <h4>Edit Jump</h4>
+                    <form id="e-jumpForm" onsubmit="return editJumpSubmit();">
+                        <select class="canvas-select" id="e-j-source">
+                            <option>Source canvas</option>
+                        </select>
+                        <br>
+                        <select class="canvas-select" id="e-j-dest">
+                            <option>Destination canvas</option>
+                        </select>
+                        <br>
+                        <select id="e-j-type">
+                            <option>Jump type</option>
+                            <option>literal_zoom_in</option>
+                            <option>literal_zoom_out</option>
+                            <option>semantic_zoom</option>
+                            <option>geometric_semantic_zoom</option>
+                            <option>load</option>
+                            <option>highlight</option>
+                            <option>slide</option>
+                        </select>
+                        <div class="button-row">
+                            <button onclick="hideEdit('j');hideEditor();return false;">Cancel</button>
+                            <input type="submit" value="Submit Changes" id="e-j-submit-btn">
+                            <br>
+                            <button onclick="return deleteJump();">Delete Jump</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            <div class="button-row">
+                <button id="c-btn" onclick="showAdd('c')">Add Canvas</button>
+                <button id="t-btn" onclick="showAdd('t')">Add Transform</button>
+                <button id="l-btn" onclick="showAdd('l')">Add Layer</button>
+                <br>
+                <button id="v-btn" onclick="showAdd('v')">Add View</button>
+                <button id="j-btn" onclick="showAdd('j')">Add Jump</button>
+            </div>
+            <div class="add-edit-div">
+                <div id="c-div" style="display:none;" class="add-edit">
+                    <h4>Add a Canvas</h4>
+                    <form id="canvasForm" onsubmit="return addCanvasSubmit();">
+                        <label for="c-id">Id </label><input id="c-id" type="text" name="c-id">
+                        <br>
+                        <label for="c-width">Width </label><input id="c-width" type="number" name="c-width">
+                        <br>
+                        <label for="c-height">Height </label><input id="c-height" type="number" name="c-height">
+                        <div class="button-row">
+                            <button onclick="hideAdd('c');return false;">Cancel</button>
+                            <input type="submit" value="Add Canvas">
+                        </div>
+                    </form>
+                </div>
+
+                <div id="t-div" style="display:none;" class="add-edit">
+                    <h4>Add a Transform</h4>
+                    <form id="transformForm" onsubmit="return addTransformSubmit();">
+                        <label for="t-name">Name </label><input id="t-name" type="text" name="t-name">
+                        <br>
+                        <label for="t-sql">SQL Query </label><input id="t-sql" type="text" name="t-sql">
+                        <br>
+                        <label for="t-db">DB Name </label><input id="t-db" type="text" name="t-db">
+                        <div id="t-func">click to write transform function</div>
+                        <label for="t-colnames">Column Names </label><input id="t-colnames" type="text" name="t-colnames">
+                        <br>
+                        <label for="t-separable">Check if separable </label><input id="t-separable" type="checkbox" name="t-separable">
+                        <div class="button-row">
+                            <button onclick="hideAdd('t');hideEditor();return false;">Cancel</button>
+                            <input type="submit" value="Add Transform" id="t-submit-btn">
+                        </div>
+                    </form>
+                </div>
+
+                <div id="l-div" style="display:none;" class="add-edit">
+                    <h4>Add a Layer</h4>
+                    <form id="layerForm" onsubmit="return addLayerSubmit();">
+                        <select id="l-transform-select">
+                            <option>Pick Transform</option>
+                        </select>
+                        <br>
+                        <label for="l-static">Check if static </label><input id="l-static" type="checkbox" name="l-static">
+                        <br>
+                        <select class="canvas-select" id="l-canvas-select">
+                            <option>Add to Canvas</option>
+                        </select>
+                        <div id="l-rendering">click to write rendering function</div>
+                        <div class="button-row">
+                            <button onclick="hideAdd('l');hideEditor();return false;">Cancel</button>
+                            <input type="submit" value="Add Layer" id="l-submit-btn">
+                        </div>
+                    </form>
+                </div>
+
+                <div id="v-div" style="display:none;" class="add-edit">
+                    <h4>Add a View</h4>
+                    <form id="viewForm" onsubmit="return addViewSubmit();">
+                        <label for="v-id">Id </label><input id="v-id" type="text" name="v-id">
+                        <br>
+                        <label for="v-minx">Min X </label><input id="v-minx" type="number" name="v-minx">
+                        <br>
+                        <label for="v-miny">Min Y </label><input id="v-miny" type="number" name="v-miny">
+                        <br>
+                        <label for="v-width">Width </label><input id="v-width" type="number" name="v-width">
+                        <br>
+                        <label for="v-height">Height </label><input id="v-height" type="number" name="v-height">
+                        <br>
+                        <b>Set initial states</b>
+                        <br>
+                        <select class="canvas-select" id="v-initialcanvas">
+                            <option>Select Canvas</option>
+                        </select>
+                        <br>
+                        <label for="v-minx">Initial X </label><input id="v-initialx" type="number" name="v-initialx">
+                        <br>
+                        <label for="v-miny">Initial Y </label><input id="v-initialy" type="number" name="v-initialy">
+                        <div class="button-row">
+                            <button onclick="hideAdd('v');return false;">Cancel</button>
+                            <input type="submit" value="Add View" id="v-submit-btn">
+                        </div>
+                    </form>
+                </div>
+
+                <div id="j-div" style="display:none;" class="add-edit">
+                    <h4>Add a Jump</h4>
+                    <form id="jumpForm" onsubmit="return addJumpSubmit();">
+                        <select class="canvas-select" id="j-source">
+                            <option>Source canvas</option>
+                        </select>
+                        <br>
+                        <select class="canvas-select" id="j-dest">
+                            <option>Destination canvas</option>
+                        </select>
+                        <br>
+                        <select id="j-type" onchange="addJumpOptional()">
+                            <option>Jump type</option>
+                            <option>literal_zoom_in</option>
+                            <option>literal_zoom_out</option>
+                            <option>semantic_zoom</option>
+                            <option>geometric_semantic_zoom</option>
+                            <option>load</option>
+                            <option>highlight</option>
+                            <option>slide</option>
+                        </select>
+                        <div class="button-row">
+                            <button onclick="hideAdd('j');hideEditor();return false;">Cancel</button>
+                            <input type="submit" value="Add Jump" id="j-submit-btn">
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
     <head>
         <meta name="referrer" content="no-referrer" />
-        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
         <link
             rel="stylesheet"
             type="text/css"
@@ -16,6 +280,7 @@
             href="https://fonts.googleapis.com/css?family=Open+Sans"
             rel="stylesheet"
         />
+        <link rel="stylesheet" type="text/css" href="/static/css/main.css" />
         <script src="https://code.jquery.com/jquery-3.2.1.min.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/gpu.js@2.0.0-rc.19/dist/gpu-browser.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/jquery-validation@1.17.0/dist/jquery.validate.min.js"></script>
@@ -23,11 +288,13 @@
         <script src="https://cdn.jsdelivr.net/npm/css-element-queries@1.2.1/src/ElementQueries.js"></script>
         <script src="https://cdn.jsdelivr.net/npm/css-element-queries@1.2.1/src/ResizeSensor.js"></script>
         <script src="https://cdnjs.cloudflare.com/ajax/libs/d3-legend/2.25.6/d3-legend.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/ace/1.4.12/ace.js" integrity="sha512-GZ1RIgZaSc8rnco/8CXfRdCpDxRCphenIiZ2ztLy3XQfCbQUSCuk8IudvNHxkRA3oUg6q0qejgN/qqyG1duv5Q==" crossorigin="anonymous"></script>
         <script src="/js/globalVar.js"></script>
         <script src="/js/parameter.js"></script>
         <script src="/js/zoom.js"></script>
         <script src="/js/zoomButton.js"></script>
         <script src="/js/pageOnLoad.js"></script>
+        <script src="/js/ui.js"></script>
         <script src="/js/dynamicLayers.js"></script>
         <script src="/js/jumpAnimation.js"></script>
         <script src="/js/jump.js"></script>
